@@ -1,0 +1,18 @@
+    # Демонстрация: подпись ломается при изменении файла
+    print("--- Демонстрация: меняем 1 байт файла и проверяем старые подписи ---")
+    with open(in_path, 'rb') as f:
+        orig = bytearray(f.read())
+    tampered = bytearray(orig)
+    if tampered:
+        tampered[0] ^= 0xFF
+    tmp = in_path + '.tampered'
+    with open(tmp, 'wb') as f:
+        f.write(tampered)
+
+    ok8_bad = rsa_verify_file(tmp, sig8, key8)
+    ok9_bad = elgamal_verify_file(tmp, sig9, key9)
+    ok10_bad = gost94_verify_file(tmp, sig10, key10)
+    print(f"[Лаба 8]  изменённый файл: {'ВЕРНА (плохо!)' if ok8_bad else 'НЕВЕРНА (ожидаемо)'}")
+    print(f"[Лаба 9]  изменённый файл: {'ВЕРНА (плохо!)' if ok9_bad else 'НЕВЕРНА (ожидаемо)'}")
+    print(f"[Лаба 10] изменённый файл: {'ВЕРНА (плохо!)' if ok10_bad else 'НЕВЕРНА (ожидаемо)'}")
+    os.remove(tmp)
